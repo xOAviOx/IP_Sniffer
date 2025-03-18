@@ -1,9 +1,10 @@
 use std::{env, net::IpAddr, str::FromStr, process};
 use std::sync::mpsc::{Sender, channel};
 use std::thread;
+use std::net::TcpStream;
+use std::io::{self,Write};
 
-
-const MAX = 65535;
+const MAX:u16 = 65535;
 struct  Arguments {
     flag: String,
     ipaddr:IpAddr,
@@ -46,7 +47,17 @@ impl Arguments {
 }
 
 fn scan(tx:Sender<u16>, start_port: u16, addr:IpAddr, num_threads:u16 ) {
-    
+    let mut port: u16 = start_port +1 ;
+    loop{
+        match TcpStream::connect((addr,port)){
+            Ok(_)=>{
+                print!(".");
+                io::stdout().flush().unwrap();
+                tx.send(port).unwrap();
+            }
+            Err(_)=>{}
+        }
+    }
 }
 
 fn main() {
@@ -71,6 +82,6 @@ fn main() {
 
         thread::spawn(move || {
             scan(tx, i , arguments.ipaddr, num_threads);
-        })
+        });
     }
 }
