@@ -57,6 +57,10 @@ fn scan(tx:Sender<u16>, start_port: u16, addr:IpAddr, num_threads:u16 ) {
             }
             Err(_)=>{}
         }
+        if(MAX - port) <= num_threads{
+            break;
+        }
+        port += num_threads;
     }
 }
 
