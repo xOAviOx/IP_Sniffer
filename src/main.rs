@@ -1,5 +1,9 @@
 use std::{env, net::IpAddr, str::FromStr, process};
+use std::sync::mpsc::{Sender, channel};
+use std::thread;
 
+
+const MAX = 65535;
 struct  Arguments {
     flag: String,
     ipaddr:IpAddr,
@@ -41,6 +45,10 @@ impl Arguments {
     }    
 }
 
+fn scan(tx:Sender<u16>, start_port: u16, addr:IpAddr, num_threads:u16 ) {
+    
+}
+
 fn main() {
     let args:Vec<String> = env::args().collect();       
 
@@ -56,4 +64,13 @@ fn main() {
             }
         }
     );
+    let num_threads = arguments.threads;
+    let (tx,rx) = channel();
+    for i in 0..num_threads{
+        let tx = tx.clone();
+
+        thread::spawn(move || {
+            scan(tx, i , arguments.ipaddr, num_threads);
+        })
+    }
 }
